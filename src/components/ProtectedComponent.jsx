@@ -8,14 +8,10 @@ function ProtectedComponent() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 1. Use the exact credentials from your PDF instructions
         const username = "doctosmarttest";
         const password = "$2y$12$9Za7UtNOljRUWVmVrq8yv.ZpuzEhK6yzI.gdKRCxw2EtUfvxySV3S";
-
-        // 2. Encode them to Base64 using btoa()
         const encodedCredentials = btoa(`${username}:${password}`);
 
-        // 3. Use the exact API URL from your PDF instructions
         const response = await fetch(
           "/api/patients?user_id=1&clinic_id=1&page_no=0",
           {
@@ -32,9 +28,12 @@ function ProtectedComponent() {
         }
 
         const result = await response.json();
+
+        console.log("Raw API Response:", result);
+
         
-        // Safely extract the array of patients from the response
-        const patientList = Array.isArray(result) ? result : result.patients || result.data || [];
+        // Correctly target result.result based on your API response structure
+        const patientList = result.result || [];
         setPatients(patientList);
       } catch (err) {
         setError(err.message || "Failed to fetch data.");
@@ -67,8 +66,9 @@ function ProtectedComponent() {
           {patients.length > 0 ? (
             patients.map((patient, index) => (
               <tr key={patient.id || index}>
-                <td>{patient.reg_id || patient.id || "-"}</td>
-                <td>{patient.name || "-"}</td>
+                {/* Updated property keys to match the API response */}
+                <td>{patient.registration_id || patient.id || "-"}</td>
+                <td>{patient.patient_name || "-"}</td>
                 <td>{patient.gender || "-"}</td>
                 <td>{patient.age || "-"}</td>
                 <td>{patient.mobile || patient.phone || "-"}</td>
